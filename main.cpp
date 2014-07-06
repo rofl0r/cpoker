@@ -69,7 +69,7 @@ for his/her enjoyment.
 void doGame()
 {
   std::cout << "Welcome to OOPoker\n\
-Copyright (c) 2010 Lode Vandevenne" << std::endl << std::endl;
+Copyright (c) 2010-2014 Lode Vandevenne" << std::endl << std::endl;
 
   char c = 0;
 
@@ -239,10 +239,11 @@ c: custom" << std::endl;
   }
   else if(gameType == 3) //AI Battle
   {
-    game.addObserver(new ObserverTerminalQuiet());
+    //game.addObserver(new ObserverTerminalQuiet());
+    game.addObserver(new ObserverTerminal());
 
-    //choose the AI players here
-    game.addPlayer(Player(new AIRandom(), getRandomName()));
+    //choose the AI players here (AISmart, AIRandom, AICall, ...)
+    game.addPlayer(Player(new AISmart(), getRandomName()));
     game.addPlayer(Player(new AISmart(), getRandomName()));
     game.addPlayer(Player(new AISmart(), getRandomName()));
     game.addPlayer(Player(new AISmart(), getRandomName()));

@@ -1,7 +1,7 @@
 /*
 OOPoker
 
-Copyright (c) 2010 Lode Vandevenne
+Copyright (c) 2010-2014 Lode Vandevenne
 All rights reserved.
 
 This file is part of OOPoker.
@@ -44,6 +44,47 @@ along with OOPoker.  If not, see <http://www.gnu.org/licenses/>.
 #include "random.h"
 #include "table.h"
 #include "info.h"
+
+////////////////////////////////////////////////////////////////////////////////
+
+void fail()
+{
+  throw 1; //that's how to let a unittest fail
+}
+
+template<typename T, typename U>
+void assertEquals(const T& expected, const U& actual, const std::string& message = "")
+{
+  if(expected != (T)actual)
+  {
+    std::cout << "Error: Not equal! Expected " << expected << " got " << (T)actual << "." << std::endl;
+    std::cout << "Message: " << message << std::endl;
+    fail();
+  }
+}
+
+void assertTrue(bool value, const std::string& message = "")
+{
+  if(!value)
+  {
+    std::cout << "Error: expected true." << std::endl;
+    std::cout << "Message: " << message << std::endl;
+    fail();
+  }
+}
+
+#define STR_EXPAND(s) #s
+#define STR(s) STR_EXPAND(s)
+#define ASSERT_EQUALS(e, v) \
+{\
+  assertEquals(e, v, std::string() + "line " + STR(__LINE__) + ": " + STR(v));\
+}
+#define ASSERT_TRUE(v) \
+{\
+  assertTrue(v, std::string() + "line " + STR(__LINE__) + ": " + STR(v));\
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 void testWinChanceAtFlop(const std::string& hcard1, const std::string& hcard2, const std::string& card1, const std::string& card2, const std::string& card3)
 {
@@ -253,6 +294,12 @@ void testDividePot(int wins0, int wins1, int wins2, int wins3, int wins4 //expec
   std::cout << "wins: " << wins[0] << " " << wins[1] << " " << wins[2] << " " << wins[3] << " " << wins[4] << std::endl;
   std::cout << "expt: " << wins0 << " " << wins1 << " " << wins2 << " " << wins3 << " " << wins4 << std::endl;
   std::cout << std::endl;
+
+  ASSERT_EQUALS(wins0, wins[0]);
+  ASSERT_EQUALS(wins1, wins[1]);
+  ASSERT_EQUALS(wins2, wins[2]);
+  ASSERT_EQUALS(wins3, wins[3]);
+  ASSERT_EQUALS(wins4, wins[4]);
 }
 
 void testDividePot()
@@ -372,35 +419,70 @@ void testCombo(const std::string& expected
   std::cout << "got: " << combo.getNameWithAllCards() << std::endl;
   std::cout << "exp: " << expected << std::endl;
   std::cout << std::endl;
+  ASSERT_EQUALS(expected, combo.getNameWithAllCards());
 }
 
 void testCombos()
 {
   testCombo("High Card ( 9h 8d 7h 5d 4d )", "5d", "4d", "3s", "2s", "7h", "8d", "9h"); //high card
-
   testCombo("Pair ( Th Td Qd Js 9s )", "Th", "5c", "3s", "Td", "9s", "Qd", "Js"); //pair
-
   testCombo("Two Pair ( Th Td 9c 9s Qd )", "Th", "9c", "3s", "Td", "9s", "Qd", "Js"); //two pair
-
   testCombo("Three Of A Kind ( 4h 4c 4d As Qd )", "4h", "4c", "As", "4d", "9s", "Qd", "Js"); //three of a kind
-
   testCombo("Straight ( Kc Qd Js Th 9s )", "Th", "Kc", "3s", "Td", "9s", "Qd", "Js"); //straight
-
-  testCombo("Flush ( Qh Th Th 9h 3h )", "Th", "Kc", "3h", "Th", "9h", "Qh", "Js"); //flush
-
-  testCombo("Full House ( 2h 2c 2s 3s 3d )", "2h", "2c", "As", "4d", "3s", "3d", "2s"); //full house
-
-  testCombo("Four Of A Kind ( Ah Ac As Ad Qd )", "Ah", "Ac", "As", "Ad", "9s", "Qd", "Js"); //four of a kind
-
-  testCombo("Straight Flush ( Kh Qh Jh Th 9h )", "Th", "Kh", "3s", "Td", "9h", "Qh", "Jh"); //straight flush
-
-  testCombo("Royal Flush ( Ah Kh Qh Jh Th )", "Th", "Kh", "3s", "Td", "Ah", "Qh", "Jh"); //royal flush
-
   testCombo("Straight ( 8c 7d 6h 5d 4s )", "2s", "3h", "4s", "5d", "6h", "7d", "8c"); //straight of 7 cards long (should take highest part)
-
   testCombo("Straight ( 5h 4c 3h 2s Ah )", "3h", "8d", "4c", "3c", "Ah", "2s", "5h"); //straight
+  testCombo("Straight ( Ah Ks Qc Jd Th )", "Th", "Jd", "Qc", "Ks", "Ah", "2s", "5h"); //straight
+  testCombo("Flush ( Qh Th Th 9h 3h )", "Th", "Kc", "3h", "Th", "9h", "Qh", "Js"); //flush
+  testCombo("Full House ( 2h 2c 2s 3s 3d )", "2h", "2c", "As", "4d", "3s", "3d", "2s"); //full house
+  testCombo("Four Of A Kind ( Ah Ac As Ad Qd )", "Ah", "Ac", "As", "Ad", "9s", "Qd", "Js"); //four of a kind
+  testCombo("Straight Flush ( Kh Qh Jh Th 9h )", "Th", "Kh", "3s", "Td", "9h", "Qh", "Jh"); //straight flush
+  testCombo("Straight Flush ( 5h 4h 3h 2h Ah )", "3h", "8d", "4h", "3c", "Ah", "2h", "5h"); //straight flush
+  testCombo("Royal Flush ( Ah Kh Qh Jh Th )", "Th", "Kh", "3s", "Td", "Ah", "Qh", "Jh"); //royal flush
+}
 
-  testCombo("Straight Flush ( 5h 4h 3h 2h Ah )", "3h", "8d", "4h", "3c", "Ah", "2h", "5h"); //straight
+// Supports 5 or 7 indices
+std::vector<int> indicesToEvalIndices(const std::vector<int>& indices)
+{
+  std::vector<int> result = indices;
+  if(result.size() == 5) {
+    for(size_t i = 0; i < result.size(); i++) result[i] = eval5_index(Card(result[i]));
+  } else {
+    for(size_t i = 0; i < result.size(); i++) result[i] = eval7_index(Card(result[i]));
+  }
+  return result;
+}
+
+// Check that the winning cards win from the losing set
+// Supports either both strings 5 cards or both strings 7 cards
+void testCombosCompare(const std::string& winning, const std::string& losing)
+{
+  std::cout << "Testing " << winning << " > " << losing << std::endl;
+  Combination w;
+  getCombo(w, winning);
+  Combination l;
+  getCombo(l, losing);
+  //std::cout << "Combos: " << w.getNameWithAllCards() << ", " << l.getNameWithAllCards() << std::endl;
+  ASSERT_EQUALS(1, compare(w, l));
+
+  std::vector<int> cw = indicesToEvalIndices(cardNamesToIndices(winning));
+  std::vector<int> cl = indicesToEvalIndices(cardNamesToIndices(losing));
+
+  if(cw.size() == 5) {
+    //std::cout << "Eval: " << eval5(&cw[0]) << ", " << eval5(&cl[0]) << std::endl;
+    ASSERT_TRUE(eval5(&cw[0]) > eval5(&cl[0]));
+  } else {
+    //std::cout << "Eval: " << eval7(&cw[0]) << ", " << eval7(&cl[0]) << std::endl;
+    ASSERT_TRUE(eval7(&cw[0]) > eval7(&cl[0]));
+}
+}
+
+// Each time, the first should be larger than the second
+void testCombosCompare()
+{
+  testCombosCompare("AhAcAdAsKh", "7h9d3s2d5h");
+  testCombosCompare("6s5h4c3c2s", "5h4c3c2sAh"); // The ace counts as 1 so first straight is better
+  testCombosCompare("2h3h4h5h6h", "Ah2h3h4h5h"); // The ace counts as 1 so first straight is better
+  testCombosCompare("6s5h4c3c2sKdTd", "5h4c3c2sAh9sTd");
 }
 
 void testRandom()
@@ -482,6 +564,8 @@ void doUnitTest()
   testBetsSettled();
 
   testCombos();
+  testCombosCompare();
   
   benchmarkEval7();
+
 }

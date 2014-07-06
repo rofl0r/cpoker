@@ -98,3 +98,7 @@ char valueToSymbol(int value);
 
 int compare(const Card& a, const Card& b);
 bool cardGreater(const Card& a, const Card& b);
+
+// string of short names to vector of card indices
+// e.g. string Ah5s becomes vector {26,43}
+std::vector<int> cardNamesToIndices(const std::string& names);

@@ -46,7 +46,18 @@ Notation ascii art representation:
  ( p )
 */
 
-  return factorial(n) / (factorial(p) * factorial(n-p));
+  if(p > n / 2)
+  {
+    p = n - p; //take advantage of symmetry
+}
+
+  double result = 1;
+  for(int i = 1; i <= p; i++)
+  {
+    result *= (n - p + i) / i;
+  }
+
+  return result;
 }
 
 
@@ -1124,7 +1135,7 @@ bool getWinChanceWithKnownHands(std::vector<double>& win, std::vector<double>& t
   
   int numUnknown = 5 - numBoard;
   
-  double exhaustiveSamples = combination(numOther, numUnknown);
+  double exhaustiveSamples = combination(numOther, numUnknown) + 0.5; //avoid rounding errors
   
   int val[numPlayers];
   

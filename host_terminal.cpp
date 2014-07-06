@@ -51,7 +51,7 @@ void HostTerminal::onDealDone(const Info& info)
   }
   else
   {
-    if(dealCount % 10 == 0) std::cout << std::endl << "Deal " << dealCount << " done." << std::endl << std::endl;
+    /*if(dealCount % 10 == 0)*/ std::cout << std::endl << "Deal " << dealCount << " done." << std::endl << std::endl;
   }
 }
 

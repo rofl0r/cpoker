@@ -22,10 +22,16 @@ along with OOPoker.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "card.h"
 
+// TODO: this setting belongs more in io_terminal
+// CARDPRINTMODE: 0=letters (cdhs), 1=windows symbols (ascii), 2=linux symbols (unicode)
 #if defined(_WIN32)
-int CARDPRINTMODE = 1; //0=cdhs, 1=windows symbols (ascii), 2=linux symbols (unicode)
+int CARDPRINTMODE = 1; 
 #elif defined(linux) || defined(__linux) || defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)
-int CARDPRINTMODE = 2; //0=cdhs, 1=windows symbols (ascii), 2=linux symbols (unicode)
+// Requires linux terminal set to UTF-8
+int CARDPRINTMODE = 2;
+//int CARDPRINTMODE = 0;
+#else
+int CARDPRINTMODE = 0;
 #endif
 
 static Suit indexToSuit(int index)
@@ -333,3 +339,19 @@ bool cardGreater(const Card& a, const Card& b)
 {
   return a.value > b.value;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+std::vector<int> cardNamesToIndices(const std::string& names)
+{
+  std::vector<int> result;
+  for(size_t i = 0; i + 1 < names.size(); i += 2)
+  {
+    result.push_back(Card(names.substr(i, 2)).getIndex());
+  }
+  return result;
+}
+
+

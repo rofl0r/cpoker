@@ -45,6 +45,7 @@ std::string comboTypeToName(ComboType type)
 
 std::string Combination::getName() const
 {
+  if(cards_used == 0) return "Nothing";
   std::string result = comboTypeToName(type);
   if(type == C_STRAIGHT_FLUSH && cards[0].value == 14) result = "Royal Flush";
   return result;
@@ -465,7 +466,7 @@ bool checkStraight(Card result[5], const std::vector<Card>& sorted)
     if(sorted[i].value == s - 4 && !result[4].isValid()) result[4] = sorted[i];
   }
   
-  if(s == 5) result[4] = sorted[0];
+  if(s == 5) result[4] = sorted[0]; // The ace as value 1
 
   return true;
 }
@@ -489,7 +490,7 @@ bool checkStraightFlush(Card result[5], const std::vector<Card>& sorted)
     }
   }
   
-  if(c.getValue() == 5) result[4] = Card(14, c.getSuit());
+  if(c.getValue() == 5) result[4] = Card(14, c.getSuit()); // The ace as value 1
 
   return true;
 }
@@ -802,6 +803,16 @@ void getCombo(Combination& combo
   getCombo(combo, cards);
 }
 
+void getCombo(Combination& combo, const std::string& cards)
+{
+  std::vector<Card> cards2;
+  for(size_t i = 0; i + 1 < cards.size(); i += 2)
+  {
+    cards2.push_back(Card(cards.substr(i, 2)));
+  }
+  getCombo(combo, cards2);
+}
+
 void getCombo(Combination& combo, const Card& card1, const Card& card2, const Card& card3, const Card& card4, const Card& card5)
 {
   std::vector<Card> cards;
@@ -813,10 +824,6 @@ void getCombo(Combination& combo, const Card& card1, const Card& card2, const Ca
   getCombo(combo, cards);
 }
 
-
-/*
-returns -1 if this combo is worth less than the other, 0 if worth the same, 1 if worth more than the other.
-*/
 int compare(const Combination& a, const Combination& b)
 {
   if((int)a.type > (int)(b.type)) return +1;

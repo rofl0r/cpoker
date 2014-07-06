@@ -111,7 +111,7 @@ the better the combination. If the values are equal, it's a tie.
 The input is cards as integers, and the integers must be created using eval7_index.
 The integers are always positive.
 */
-int eval7(const int* cards);
+int eval7(const int* cards /*NOT card.getIndex()!!!*/);
 int eval7_index(const Card& card);
 ComboType eval7_category(int result); //converts result from eval to named combo type (without info about card values)
 
@@ -119,7 +119,7 @@ ComboType eval7_category(int result); //converts result from eval to named combo
 Similar to eval7 but for 5 cards. Note: integer values related to eval7 and evan7index are NOT
 interchangeable with those of eval5!
 */
-int eval5(const int* cards);
+int eval5(const int* cards /*NOT card.getIndex()!!!*/);
 int eval5_index(const Card& card);
 ComboType eval5_category(int result); //converts result from eval to named combo type (without info about card values)
 
@@ -128,7 +128,7 @@ Similar to eval5 and eval7, but for 6 cards, e.g. to calculate what combination 
 after the turn before the river. This function is called "slow" because it uses 6 calls to eval5.
 It's still a lot faster than the naive (but more convenient) implementation in combination.h
 */
-int eval6_slow(const int* cards);
+int eval6_slow(const int* cards /*NOT card.getIndex()!!!*/);
 int eval6_index_slow(const Card& card);
 ComboType eval6_category(int result); //converts result from eval to named combo type (without info about card values)
 

@@ -8,6 +8,8 @@ and, it's 3 times faster.
 Cleaned up a bit, used int64_t, made work with g++ compiler,
 and placed two .c files in one .cpp file for OOPoker. Made interface
 around it that uses one integer per card.
+
+Applied bugfix mentioned in http://poker-ai.org/archive/pokerai.org/pf3/viewtopica3e8-2.html
 */ 
 
 #include "pokereval2.h"
@@ -160,16 +162,16 @@ void InitializeHandRankingTables(void)
     Bit2[i] = 0;
   }
 
-  for (c5 = 14; c5 > 4; c5--) {
-    c4 = c5-1; 
-    c3 = c4-1; 
-    c2 = c3-1; 
-    c1 = c2-1;
-    if (c1 == 1) c1 = 14;
+  for (c1 = 14; c1 > 4; c1--) {
+    c2 = c1-1;
+    c3 = c2-1;
+    c4 = c3-1;
+    c5 = c4-1;
+    if (c5 == 1) c5 = 14;
     for (c6 = 14; c6 > 1; c6--) {
-      if (c6 != c5+1) {
+      if (c6 != c1+1) {
         for (c7 = c6-1; c7 > 1; c7--) {
-          if (c7 != c5+1) {
+          if (c7 != c1+1) {
             i = (1 << c1) | (1 << c2) | (1 << c3) | (1 << c4) | (1 << c5) | (1 << c6) | (1 << c7);
             Flush[i >> 2] = STRFLUSH_FLAG | (c1 << 16) | (c2 << 12) | (c3 << 8) | (c4 << 4) | c5;
             Straight[i >> 2] = STRAIGHT_FLAG | (c1 << 16) | (c2 << 12) | (c3 << 8) | (c4 << 4) | c5;

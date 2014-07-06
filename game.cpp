@@ -1,7 +1,7 @@
 /*
 OOPoker
 
-Copyright (c) 2010 Lode Vandevenne
+Copyright (c) 2010-2014 Lode Vandevenne
 All rights reserved.
 
 This file is part of OOPoker.
@@ -511,36 +511,37 @@ void Game::sendEvents(Table& table)
 //all players who have no money left are kicked out or rebuy. Dealer is updated to be a non-out player.
 void Game::kickOutPlayers(Table& table)
 {
-  std::vector<Player>& players = table.players;
-  for(int i = 0; i < (int)players.size(); i++)
+  std::vector<Player>& playersIn = table.players;
+  for(int i = 0; i < (int)playersIn.size(); i++)
   {
     bool leave = false;
-    if(players[i].isOut())
+    if(playersIn[i].isOut())
     {
       if(rules.allowRebuy)
       {
-        events.push_back(Event(E_REBUY, players[i].getName(), rules.buyIn));
-        players[i].buyInTotal += rules.buyIn;
-        players[i].stack = rules.buyIn;
+        events.push_back(Event(E_REBUY, playersIn[i].getName(), rules.buyIn));
+        playersIn[i].buyInTotal += rules.buyIn;
+        playersIn[i].stack = rules.buyIn;
       }
       else
       {
         leave = true;
       }
     }
-    else if(players[i].isHuman())
+    else if(playersIn[i].isHuman())
     {
       Info info;
       makeInfo(info, table, rules, i);
-      if(players[i].ai->wantsToLeave(info)) leave = true;
+      if(playersIn[i].ai->wantsToLeave(info)) leave = true;
     }
 
     if(leave)
     {
-      events.push_back(Event(E_QUIT, players[i].getName(), players[i].stack));
-      playersOut.push_back(players[i]);
-      players.erase(players.begin() + i);
-      if(table.dealer > i) table.dealer--;
+      events.push_back(Event(E_QUIT, playersIn[i].getName(), playersIn[i].stack));
+      playersOut.push_back(playersIn[i]);
+      playersIn.erase(playersIn.begin() + i);
+      if(table.dealer > i) table.dealer--; // if i == table.dealer, it stays: that makes next player after the one who left the dealer
+      if(table.dealer >= (int)playersIn.size()) table.dealer = 0; // if player at the end of array leaves. Dealer wraps around to 0.
       i--;
     }
   }

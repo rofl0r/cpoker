@@ -56,7 +56,8 @@ void editOptions(Options& options)
 2: set speed to slow\n\
 3: set speed to slowest\n\
 4: toggle offer boast cards\n\
-5: toggle auto analytics\n" << std::endl;
+5: toggle auto analytics\n\
+6: toggle unicode card symbols\n" << std::endl;
 
   std::string s = getLine();
 
@@ -66,6 +67,11 @@ void editOptions(Options& options)
   else if(s == "3") options.sleepMS = 2000;
   else if(s == "4") options.offerBoastCards = !options.offerBoastCards;
   else if(s == "5") options.autoAnalytics = !options.autoAnalytics;
+#if defined(_WIN32)
+  else if(s == "6") CARDPRINTMODE = CARDPRINTMODE ? 0 : 1;
+#else
+  else if(s == "6") CARDPRINTMODE = CARDPRINTMODE ? 0 : 2;
+#endif
 }
 
 void editOptions()
@@ -92,6 +98,13 @@ static void showAnalytics(const Info& info)
 {
   std::cout << std::endl;
   std::cout << " * Analytics * " << std::endl;
+  Combination combo;
+  getCombo(combo, info.getHandTableVector());
+  std::cout << "> Hand: " << combo.getNameWithAllCardsPrintable() << std::endl;
+  if(!info.boardCards.empty()) {
+    getCombo(combo, info.boardCards);
+    std::cout << "> Table only: " << combo.getNameWithAllCardsPrintable() << std::endl;
+  }
   if(info.round == R_PRE_FLOP)
   {
     std::cout << "> Group: " << getSklanskyMalmuthGroup(info.getHoleCards()[0], info.getHoleCards()[1]) << std::endl;
@@ -119,7 +132,8 @@ Action AIHuman::doTurn(const Info& info)
     std::cout << "Enter chip amount to move to the table, or letter for special action" << std::endl;
     //(" << call << " to call, min " << (info.minRaiseAmount + call) << " to raise, q to quit, o for options): ";
     std::cout << "Options: q = quit, a = analytics, o = options, number = wager chips" << std::endl;
-    std::cout << "Enter amount (" << call << " to call, min " << info.getMinChipsToRaise() << " to raise): " << std::endl;
+    if (call == 0) std::cout << "Enter amount (" << call << " to call, min " << info.getMinChipsToRaise() << " to raise): " << std::endl;
+    else std::cout << "Enter amount (" << call << " to call, min " << info.getMinChipsToRaise() << " to raise, 0 to fold): " << std::endl;
     std::string s = getLine();
     if(s == "q" || s == "Q")
     {

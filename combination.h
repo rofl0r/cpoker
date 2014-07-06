@@ -188,9 +188,11 @@ void getCombo(Combination& combo
             , const std::string& card5
             , const std::string& card6
             , const std::string& card7);
+//string.size() / 2 cards given by short names combined in one string
+void getCombo(Combination& combo, const std::string& cards);
 
 
-//returns -1 if this combo is worth less than the other, 0 if worth the same, 1 if worth more than the other.
+//returns -1 if combo a is worth less than combo b, 0 if worth the same, 1 if combo a is worth more than combo b.
 int compare(const Combination& a, const Combination& b);
 
 bool combinationGreater(const Combination& a, const Combination& b);
